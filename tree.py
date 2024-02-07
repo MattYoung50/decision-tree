@@ -6,11 +6,16 @@ matplotlib.use('Agg')
 import pandas
 from sklearn import tree
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn import metrics
 import matplotlib.pyplot as plt
 
-
+# read data
 attributes = ['buying', 'maint', 'doors', 'persons', 'lug_boot', 'safety', 'class']
 df = pandas.read_csv('car.data', names=attributes)
+df.head()
+
+# normalize data into integers
 buying_transform = {'vhigh': 1, 'high': 2, 'med': 3, 'low': 4}
 maint_transform = {'vhigh': 1, 'high': 2, 'med': 3, 'low': 4}
 doors_transform = {'2': 1, '3': 2, '4': 3, '5more': 4}
@@ -26,17 +31,30 @@ df['lug_boot'] = df['lug_boot'].map(lug_boot_transform)
 df['safety'] = df['safety'].map(safety_transform)
 df['class'] = df['class'].map(class_transform)
 
-X = df[attributes]
-Y = df['maint']
+# Select features and target
+attributes_minus_class = ['buying', 'maint', 'doors', 'persons', 'lug_boot', 'safety']
+X = df[attributes_minus_class]
+y = df['class']
+
+# Split data into training and testing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1) # 70% training and 30% test
+
 
 dtree = DecisionTreeClassifier()
-dtree = dtree.fit(X, Y)
+# Run decision tree with all data
+dtree = dtree.fit(X, y)
 
-fig = plt.figure(figsize=(25,20))
+# Train Decision Tree Classifer
+#dtree = dtree.fit(X_train, y_train)
 
-tree.plot_tree(dtree, feature_names=attributes, class_names=['vhigh', 'high', 'med', 'low'], filled=True, rounded=True, fontsize=10)
+# predict response
+y_pred = dtree.predict(X_test)
+
+
+# show results
+print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+
+fig = plt.figure(figsize=(100,25))
+
+tree.plot_tree(dtree, feature_names=attributes_minus_class, class_names=['v-good', 'good', 'acc', 'unacc'], filled=True, rounded=True, fontsize=10)
 fig.savefig("tree.png")
-# plt.savefig(sys.stdout.buffer)
-# sys.stdout.flush()
-#plt.show()
-#print(df)
