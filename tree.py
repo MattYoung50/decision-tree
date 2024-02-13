@@ -36,25 +36,38 @@ attributes_minus_class = ['buying', 'maint', 'doors', 'persons', 'lug_boot', 'sa
 X = df[attributes_minus_class]
 y = df['class']
 
-# Split data into training and testing
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1) # 70% training and 30% test
+# In the first step we will split the data in training and remaining dataset
+X_train, X_rem, y_train, y_rem = train_test_split(X,y, train_size=0.8, random_state=1)
 
+# Now since we want the valid and test size to be equal (10% each of overall data). 
+# we have to define valid_size=0.5 (that is 50% of remaining data)
+X_valid, X_test, y_valid, y_test = train_test_split(X_rem,y_rem, test_size=0.5)
+print("X_train: ", X_train.shape), print("y_train: ", y_train.shape)
+print("X_valid: ", X_valid.shape), print("y_valid: ", y_valid.shape)
+print("X_test: ", X_test.shape), print("y_test: ", y_test.shape)
 
 dtree = DecisionTreeClassifier()
-# Run decision tree with all data
-dtree = dtree.fit(X, y)
+#dtree = DecisionTreeClassifier(criterion="entropy", random_state=100, max_depth=3, min_samples_leaf=5)
+#dtree = DecisionTreeClassifier(criterion="gini", random_state=100, max_depth=3, min_samples_leaf=5)
 
-# Train Decision Tree Classifer
-#dtree = dtree.fit(X_train, y_train)
+# Run decision tree with all data
+#dtree = dtree.fit(X, y)
+#Train Decision Tree Classifer
+dtree = dtree.fit(X_train, y_train)
 
 # predict response
-y_pred = dtree.predict(X_test)
+y_pred_test = dtree.predict(X_test)
+y_pred_valid = dtree.predict(X_valid)
 
 
 # show results
-print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+print("Accuracy of Test:", metrics.accuracy_score(y_test, y_pred_test))
+print("Accuracy of Validation:", metrics.accuracy_score(y_valid, y_pred_valid))
 
+# plot big tree
 fig = plt.figure(figsize=(100,25))
+# plot small tree
+#fig = plt.figure(figsize=(10,10))
 
-tree.plot_tree(dtree, feature_names=attributes_minus_class, class_names=['v-good', 'good', 'acc', 'unacc'], filled=True, rounded=True, fontsize=10)
+tree.plot_tree(dtree, feature_names=attributes_minus_class, class_names=['unacc', 'acc', 'good', 'v-good'], filled=True, rounded=True, fontsize=10)
 fig.savefig("tree.png")
