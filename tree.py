@@ -37,7 +37,7 @@ X = df[attributes_minus_class]
 y = df['class']
 
 # In the first step we will split the data in training and remaining dataset
-X_train, X_rem, y_train, y_rem = train_test_split(X,y, train_size=0.8, random_state=1)
+X_train, X_rem, y_train, y_rem = train_test_split(X,y, train_size=0.9, random_state=1)
 
 # Now since we want the valid and test size to be equal (10% each of overall data). 
 # we have to define valid_size=0.5 (that is 50% of remaining data)
@@ -46,23 +46,25 @@ print("X_train: ", X_train.shape), print("y_train: ", y_train.shape)
 print("X_valid: ", X_valid.shape), print("y_valid: ", y_valid.shape)
 print("X_test: ", X_test.shape), print("y_test: ", y_test.shape)
 
-dtree = DecisionTreeClassifier()
+dtree = DecisionTreeClassifier(criterion="gini")
 #dtree = DecisionTreeClassifier(criterion="entropy", random_state=100, max_depth=3, min_samples_leaf=5)
 #dtree = DecisionTreeClassifier(criterion="gini", random_state=100, max_depth=3, min_samples_leaf=5)
 
-# Run decision tree with all data
-#dtree = dtree.fit(X, y)
-#Train Decision Tree Classifer
 dtree = dtree.fit(X_train, y_train)
 
 # predict response
 y_pred_test = dtree.predict(X_test)
+y_pred_train = dtree.predict(X_train)
 y_pred_valid = dtree.predict(X_valid)
 
 
 # show results
 print("Accuracy of Test:", metrics.accuracy_score(y_test, y_pred_test))
-print("Accuracy of Validation:", metrics.accuracy_score(y_valid, y_pred_valid))
+print("Accuracy of Training:", metrics.accuracy_score(y_train, y_pred_train))
+print("Accuracy of Validition:", metrics.accuracy_score(y_valid, y_pred_valid))
+print("Node count: ", dtree.tree_.node_count)
+print('Number of leaf nodes:', dtree.get_n_leaves())
+#print("Accuracy of Validation:", metrics.accuracy_score(y_valid, y_pred_valid))
 
 # plot big tree
 fig = plt.figure(figsize=(100,25))
